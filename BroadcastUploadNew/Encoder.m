@@ -120,7 +120,11 @@
                 bufferOffset += AVCCHeaderLength + NALUnitLength;
             }
         }
-
+        f.fid = 0;
+        f.packet_size = 0;
+        f.total_packets = 0;
+        f.nr_segs = f.frame_seg.count;
+        [senderBuffer enQueue:f];
     });
     
 }
