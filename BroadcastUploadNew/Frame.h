@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <CoreMedia/CoreMedia.h>
 @interface Frame : NSObject
-@property CVImageBufferRef imageBuffer;
-@property CMTime presentationTime;
--(Frame*)createFrameWithImageBuffer:(CVImageBufferRef)imageBuffer AndPresentationTime:(CMTime)presentationTime;
--(void)destroyFrame;
+@property uint32_t frame_size;
+//@property uint32_t packet_size;
+//@property uint32_t total_packets;
+@property NSMutableArray *frame_seg;
+//@property int nr_segs;
 @end

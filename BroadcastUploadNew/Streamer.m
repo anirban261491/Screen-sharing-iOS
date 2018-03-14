@@ -46,6 +46,8 @@ struct frame_packet {
     uint32_t offset;            // offset of this packet in the frame in byte
     uint32_t length;            // payload length of this packet
     
+    uint64_t timestamp;
+    uint64_t flag;
     
     char data[0];                // "pointer" to the payload
 };
@@ -167,6 +169,8 @@ int send_frame(uint32_t fid, unsigned char *frame, uint32_t frame_size, uint32_t
         packet->length = len;
         
         memcpy(packet->data, frame + offset, len);
+        
+        NSData *data = [NSData dataWithBytes:packet length:len];
         
         ret = sendto(watcher_fd, packet, len + sizeof(struct frame_packet), 0,
                      (struct sockaddr *) &watcher_addr, sizeof(watcher_addr));
