@@ -7,14 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreMedia/CoreMedia.h>
-#import <CoreImage/CoreImage.h>
+#import "Frame.h"
 @interface SenderBuffer : NSObject
 
 -(SenderBuffer*) initWithSize:(int)s;
 -(BOOL)isEmpty;
 -(BOOL)isFull;
--(void)enQueue:(NSData *)jpegData;
--(NSData *)deQueue;
+-(void)enQueue:(Frame *)jpegData;
+-(Frame *)deQueue;
 
 @end

@@ -9,6 +9,8 @@
 #import "Encoder.h"
 #import <VideoToolbox/VideoToolbox.h>
 #import <UIKit/UIKit.h>
+#import "TimeManager.h"
+#import "Frame.h"
 @interface Encoder()
 {
     VTCompressionSessionRef encodingSession;
@@ -39,6 +41,9 @@
     
     CMTime presentationTimeStamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
     
+    Frame *f = [Frame new];
+    f.timestamp = grabber_ts - init_ts;
+    
     VTEncodeInfoFlags flags;
     
     VTCompressionSessionEncodeFrameWithOutputHandler(encodingSession, imageBuffer, presentationTimeStamp, kCMTimeInvalid, NULL, &flags, ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
@@ -65,10 +70,10 @@
         OSStatus statusCodeRet = CMBlockBufferGetDataPointer(dataBuffer, 0, &length, &totalLength, &dataPointer);
         if(statusCodeRet == kCMBlockBufferNoErr)
         {
-            NSData *jpegData = [[NSData alloc] initWithBytes:dataPointer length:totalLength];
+            f.jpegData = [[NSData alloc] initWithBytes:dataPointer length:totalLength];
             //UIImage *image = [UIImage imageWithData:jpegData];
             if(![senderBuffer isFull])
-                [senderBuffer enQueue:jpegData];
+                [senderBuffer enQueue:f];
         }
     });
     

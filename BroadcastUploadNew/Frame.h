@@ -7,10 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreMedia/CoreMedia.h>
+
 @interface Frame : NSObject
-@property CVImageBufferRef imageBuffer;
-@property CMTime presentationTime;
--(Frame*)createFrameWithImageBuffer:(CVImageBufferRef)imageBuffer AndPresentationTime:(CMTime)presentationTime;
--(void)destroyFrame;
+@property uint64_t timestamp;
+@property NSData *jpegData;
 @end

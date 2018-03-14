@@ -10,6 +10,8 @@
 #import <netinet/in.h>
 #import <arpa/inet.h>
 #import <UIKit/UIKit.h>
+#import "TimeManager.h"
+#import "Frame.h"
 @interface Streamer()
 {
     char *watcher_ip;
@@ -17,6 +19,7 @@
     SenderBuffer *senderBuffer;
     int fps;
     int period;
+    TimeManager *timeManager;
 }
 @end
 
@@ -46,7 +49,7 @@ struct frame_packet {
     uint32_t offset;            // offset of this packet in the frame in byte
     uint32_t length;            // payload length of this packet
     
-    
+    uint64_t timestamp;
     char data[0];                // "pointer" to the payload
 };
 
@@ -59,6 +62,7 @@ struct frame_packet {
     senderBuffer = buffer;
     fps = 15;
     period = 1000000 / fps;
+    timeManager = [TimeManager sharedManager];
     return self;
 }
 
@@ -81,7 +85,6 @@ struct frame_packet {
     watcher_addr.sin_addr.s_addr = inet_addr(watcher_ip);
     watcher_addr.sin_port = htons(watcher_port);
     
-    uint64_t init_ts = get_us();
     uint32_t fid;
     for (fid = 0; ; fid++) {
         
@@ -91,21 +94,21 @@ struct frame_packet {
         
         //Grab JPEG data
         
-        NSData *jpegData;
+        Frame *frame;
         if(![senderBuffer isEmpty])
         {
             @autoreleasepool{
-                jpegData = [senderBuffer deQueue];
+                frame = [senderBuffer deQueue];
             }
         }
         
         //uint64_t grabber_ts = get_us();
         
-        size_t frame_len_encoded = [jpegData length];
+        size_t frame_len_encoded = [frame.jpegData length];
 
         //uint64_t encoder_ts = get_us();
         __block unsigned char *frame_buffer_final = NULL;
-        [jpegData enumerateByteRangesUsingBlock:^(const void * _Nonnull bytes, NSRange byteRange, BOOL * _Nonnull stop) {
+        [frame.jpegData enumerateByteRangesUsingBlock:^(const void * _Nonnull bytes, NSRange byteRange, BOOL * _Nonnull stop) {
             frame_buffer_final = (unsigned char *)bytes;
         }];
         
@@ -113,7 +116,7 @@ struct frame_packet {
         uint32_t total_packets = frame_size_final / packet_size_default
         + (frame_size_final % packet_size_default > 0);
         
-        int ret = send_frame(fid, frame_buffer_final, frame_size_final, packet_size_default, watcher_fd, watcher_addr);
+        int ret = send_frame(fid, frame_buffer_final, frame.timestamp, frame_size_final, packet_size_default, watcher_fd, watcher_addr);
         
         if (ret < 0) {
             
@@ -123,17 +126,17 @@ struct frame_packet {
         //uint64_t sender_ts = get_us();
         
         uint64_t next_streamer_ts = init_ts + period * (fid + 1);
-        uint64_t ts = get_us();
+        uint64_t ts = [timeManager getTimestamp];
         
         while(ts < next_streamer_ts) {
             
             nanosleep(&idle, NULL);
-            ts = get_us();
+            ts = [timeManager getTimestamp];
         }
     }
 }
 
-int send_frame(uint32_t fid, unsigned char *frame, uint32_t frame_size, uint32_t packet_size,
+int send_frame(uint32_t fid, unsigned char *frame, uint64_t timestamp, uint32_t frame_size, uint32_t packet_size,
                int watcher_fd, struct sockaddr_in watcher_addr) {
     
     // segment the frame, attach header, and send the frame to the designated address
@@ -165,13 +168,13 @@ int send_frame(uint32_t fid, unsigned char *frame, uint32_t frame_size, uint32_t
         packet->total_packets = total_packet;
         packet->offset = offset;
         packet->length = len;
-        
+        packet->timestamp = timestamp;
         memcpy(packet->data, frame + offset, len);
         
         ret = sendto(watcher_fd, packet, len + sizeof(struct frame_packet), 0,
                      (struct sockaddr *) &watcher_addr, sizeof(watcher_addr));
         
-        uint64_t sender_ts = get_us();
+        //uint64_t sender_ts = get_us();
         
         //printf("%d / %d, %d, %s\n", offset, frame_size, ret, strerror(errno));
         
@@ -195,17 +198,5 @@ int send_frame(uint32_t fid, unsigned char *frame, uint32_t frame_size, uint32_t
     return packet_id;
 }
 
-
-static inline uint64_t get_us() {
-    
-    struct timespec spec;
-    
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    
-    uint64_t s  = spec.tv_sec;
-    uint64_t us = spec.tv_nsec / 1000 + s * 1000 * 1000;
-    
-    return us;
-}
 
 @end

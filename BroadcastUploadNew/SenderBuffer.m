@@ -37,24 +37,24 @@
     return (rear + 1) % size == front ? TRUE : FALSE;
 }
 
--(void)enQueue:(NSData *)jpegData
+-(void)enQueue:(Frame *)frame
 {
     if(arr.count < size)
     {
-        [arr addObject:(jpegData)];
+        [arr addObject:(frame)];
     }
     else
     {
-        arr[rear] = (jpegData);
+        arr[rear] = frame;
     }
     rear = (rear + 1) % size;
 }
 
--(NSData *)deQueue
+-(Frame *)deQueue
 {
-    NSData *jpegData = [arr objectAtIndex:front];
+    Frame *frame = [arr objectAtIndex:front];
     front = (front + 1) % size;
-    return jpegData;
+    return frame;
 }
 
 

@@ -11,6 +11,7 @@
 #import "Encoder.h"
 #import "SenderBuffer.h"
 #import "Streamer.h"
+#import "TimeManager.h"
 @interface SampleHandler()
 {
     Encoder *encoder;
@@ -18,6 +19,7 @@
     SenderBuffer *senderBuffer;
     NSThread *streamerThread;
     Streamer *streamer;
+    TimeManager *timeManager;
 }
 @end
 char *ip = "172.20.10.14";
@@ -33,6 +35,7 @@ int bufferSize = 30;
     [self createStreamer];
     [self createStreamerThread];
     [self startStreamingThread];
+    [self createTimeManager];
 }
 
 -(void)createStreamer
@@ -69,6 +72,10 @@ int bufferSize = 30;
 -(void)createSenderBufferWithSize:(int)size
 {
     senderBuffer = [[SenderBuffer new] initWithSize:size];
+}
+
+- (void)createTimeManager{
+    timeManager = [TimeManager sharedManager];
 }
 
 - (void)broadcastPaused {
