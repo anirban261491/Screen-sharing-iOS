@@ -307,9 +307,9 @@ int send_frame_seg(Frame *f, uint32_t pid_offset, uint32_t byte_offset, int seg_
 //        }
         
         packet_id++;
-//        remain -= len;
-//        frame_offset += len;
-//        seg_offset += len;
+        remain -= len;
+        frame_offset += len;
+        seg_offset += len;
         
         
     }
