@@ -11,6 +11,7 @@
 		5A7822E3203364B600EA78A1 /* SenderBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7822E2203364B600EA78A1 /* SenderBuffer.m */; };
 		5A8FFCB82040853E003078C8 /* img.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5A8FFCB72040853D003078C8 /* img.jpg */; };
 		5A8FFCF920448AF3003078C8 /* Streamer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8FFCF820448AF3003078C8 /* Streamer.m */; };
+		5ACB419220599FB4006F2550 /* TimeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACB419120599FB4006F2550 /* TimeManager.m */; };
 		5AFC3ED62032014900E53419 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC3ED52032014900E53419 /* AppDelegate.m */; };
 		5AFC3ED92032014900E53419 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC3ED82032014900E53419 /* ViewController.m */; };
 		5AFC3EDC2032014900E53419 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AFC3EDA2032014900E53419 /* Main.storyboard */; };
@@ -83,6 +84,8 @@
 		5A8FFCB72040853D003078C8 /* img.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img.jpg; sourceTree = "<group>"; };
 		5A8FFCF720448AF3003078C8 /* Streamer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Streamer.h; sourceTree = "<group>"; };
 		5A8FFCF820448AF3003078C8 /* Streamer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Streamer.m; sourceTree = "<group>"; };
+		5ACB419020599FB4006F2550 /* TimeManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimeManager.h; sourceTree = "<group>"; };
+		5ACB419120599FB4006F2550 /* TimeManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TimeManager.m; sourceTree = "<group>"; };
 		5AFC3ED12032014900E53419 /* BroadcastNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BroadcastNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AFC3ED42032014900E53419 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5AFC3ED52032014900E53419 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -238,6 +241,8 @@
 				5A5438BB203B63B900DE5688 /* Frame.m */,
 				5A8FFCF720448AF3003078C8 /* Streamer.h */,
 				5A8FFCF820448AF3003078C8 /* Streamer.m */,
+				5ACB419020599FB4006F2550 /* TimeManager.h */,
+				5ACB419120599FB4006F2550 /* TimeManager.m */,
 			);
 			path = BroadcastUploadNew;
 			sourceTree = "<group>";
@@ -473,6 +478,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ACB419220599FB4006F2550 /* TimeManager.m in Sources */,
 				5AFC3F2F203201C000E53419 /* Encoder.m in Sources */,
 				5A5438BC203B63B900DE5688 /* Frame.m in Sources */,
 				5A8FFCF920448AF3003078C8 /* Streamer.m in Sources */,

@@ -11,6 +11,7 @@
 #import <arpa/inet.h>
 #import <UIKit/UIKit.h>
 #import "Frame.h"
+#import "TimeManager.h"
 @interface Streamer()
 {
     char *watcher_ip;
@@ -18,6 +19,7 @@
     SenderBuffer *senderBuffer;
     int fps;
     int period;
+    TimeManager *timeManager;
 }
 @end
 
@@ -62,6 +64,7 @@ struct frame_packet {
     senderBuffer = buffer;
     fps = 15;
     period = 1000000 / fps;
+    timeManager = [TimeManager sharedManager];
     return self;
 }
 
@@ -84,7 +87,6 @@ struct frame_packet {
     watcher_addr.sin_addr.s_addr = inet_addr(watcher_ip);
     watcher_addr.sin_port = htons(watcher_port);
     
-    uint64_t init_ts = get_us();
     uint32_t fid;
     uint32_t pid_offset;
     uint32_t byte_offset;
@@ -95,7 +97,7 @@ struct frame_packet {
         
         //uint64_t streamer_ts = get_us();
         
-        //Grab JPEG data
+        // Dequeue frame from FIFO buffer
         
         Frame *f;
         if(![senderBuffer isEmpty])
@@ -123,12 +125,12 @@ struct frame_packet {
         //uint64_t sender_ts = get_us();
         
         uint64_t next_streamer_ts = init_ts + period * (fid + 1);
-        uint64_t ts = get_us();
+        uint64_t ts = [timeManager getTimestamp];
         
         while(ts < next_streamer_ts) {
             
             nanosleep(&idle, NULL);
-            ts = get_us();
+            ts = [timeManager getTimestamp];
         }
     }
 }
@@ -278,7 +280,7 @@ int send_frame_seg(Frame *f, uint32_t pid_offset, uint32_t byte_offset, int seg_
         ret = sendto(watcher_fd, packet, len + sizeof(struct frame_packet), 0,
                      (struct sockaddr *) &watcher_addr, sizeof(watcher_addr));
         
-        uint64_t sender_ts = get_us();
+        //uint64_t sender_ts = get_us();
         
         //printf("%d / %d, %d, %s\n", offset, frame_size, ret, strerror(errno));
         
@@ -317,17 +319,5 @@ int send_frame_seg(Frame *f, uint32_t pid_offset, uint32_t byte_offset, int seg_
     return nr_packet;
 }
 
-
-static inline uint64_t get_us() {
-    
-    struct timespec spec;
-    
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    
-    uint64_t s  = spec.tv_sec;
-    uint64_t us = spec.tv_nsec / 1000 + s * 1000 * 1000;
-    
-    return us;
-}
 
 @end

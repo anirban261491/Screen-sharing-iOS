@@ -10,6 +10,7 @@
 #import <VideoToolbox/VideoToolbox.h>
 #import <UIKit/UIKit.h>
 #import "Frame.h"
+#import "TimeManager.h"
 @interface Encoder()
 {
     VTCompressionSessionRef encodingSession;
@@ -38,11 +39,16 @@
 {
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     
-    CMTime presentationTimeStamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
     
     VTEncodeInfoFlags flags;
     
-    VTCompressionSessionEncodeFrameWithOutputHandler(encodingSession, imageBuffer, presentationTimeStamp, kCMTimeInvalid, NULL, &flags, ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
+    __block Frame *f = [Frame new];
+    f.timestamp = grabber_ts - init_ts;
+    f.frame_seg = [NSMutableArray new];
+    f.frame_size = 0;
+    
+    VTCompressionSessionEncodeFrameWithOutputHandler(encodingSession, imageBuffer, pts, kCMTimeInvalid, NULL, &flags, ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
         
         if (status != noErr) {
             NSLog(@"H264: VTCompressionSessionEncodeFrame failed with %d", (int)status);
@@ -60,9 +66,6 @@
             return;
         }
         
-        Frame *f = [Frame new];
-        f.frame_seg = [NSMutableArray new];
-        f.frame_size = 0;
         
         // Check if we have got a key frame first
         bool keyframe = !CFDictionaryContainsKey( (CFArrayGetValueAtIndex(CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, true), 0)), kCMSampleAttachmentKey_NotSync);
@@ -129,7 +132,17 @@
     
 }
 
-
+static inline uint64_t get_us() {
+    
+    struct timespec spec;
+    
+    clock_gettime(CLOCK_MONOTONIC, &spec);
+    
+    uint64_t s  = spec.tv_sec;
+    uint64_t us = spec.tv_nsec / 1000 + s * 1000 * 1000;
+    
+    return us;
+}
 
 
 @end

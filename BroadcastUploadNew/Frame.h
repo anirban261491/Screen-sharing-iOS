@@ -15,4 +15,5 @@
 @property uint32_t total_packets;
 @property NSMutableArray *frame_seg;
 @property int nr_segs;
+@property uint64_t timestamp;
 @end
